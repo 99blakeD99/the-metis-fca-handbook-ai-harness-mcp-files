@@ -1,6 +1,6 @@
 {
   "$schema": "https://registry.modelcontextprotocol.io/schema.json",
-  "name": "io.github.99blakeD99/fca-handbook-harness",
+  "name": "io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
   "version": "3.0.0",
   "description": "MCP server for semantic FCA Handbook compliance analysis. Evaluate which FCA Handbook entries apply to a product, service, or firm with verbatim citations and structured compliance reasoning.",
   "author": "Metis",
