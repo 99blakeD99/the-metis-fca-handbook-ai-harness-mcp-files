@@ -6,6 +6,49 @@ An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI
 
 Use this tool to analyze FCA Handbook applicability for a product, service, or firm. Returns structured compliance reasoning with verbatim handbook citations.
 
+## Why choose The Metis FCA Handbook AI Harness?
+
+- **Efficiency** Multiplies effectiveness of compliance advice. Saves £80+ in token fees per Harness run.
+
+- **Deals with "Hard Problem"**, in which LLMs' token incentives prioritise training data so results are unreliable.
+
+- **Verbatim citations** Quotes verbatim entries from the FCA Handbook. Other AI systems struggle to do this.
+
+- **Matches real-world need** You do not have to start off knowing which sections you are looking for. Carries out structured searches across all 10,000+ FCA Handbook entries.
+
+- **Secure Design** Harness compartmentalisation, one-shot structure, and statelessness fits natively with emerging AI agent security standards such as OWASP Top 10 for Agentic Applications 2026.
+
+- **AI Accessible** Integrates easily with AI workflows and agents. Your LLM can use it as a tool.
+
+## Design Principles
+
+The Harness is built on proven principles:
+
+- **Stateless** — Each request is independent; no session coupling
+- **One-shot** — Complete analysis in a single call; no multi-turn state
+- **Clear contract** — Explicit input/output schemas for easy integration
+- **Hosted** — Single canonical source; no version drift or stale data
+
+## Use Cases
+
+### Compliance AI Platforms
+Embed FCA reasoning as a service within your compliance platform. Users ask natural-language questions; your platform calls the Harness and presents structured reasoning.
+
+### AI Agent Workflows
+Agents building compliance workflows can include FCA Handbook reasoning as a composed tool—no external API calls, just MCP configuration.
+
+### Compliance Review Automation
+Integrate into document review or due-diligence pipelines. Automatically screen new rules against FCA applicability.
+
+## For Regulatory Screening
+
+FS firms screening MCP servers will find:
+- **Simple model:** Stateless, no hidden state, no background jobs
+- **Clear contract:** Explicit input schema, output schema, error modes
+- **Transparent updates:** Version pinning; no automatic upgrades
+- **Single point of failure:** If the Harness is down, it is obvious; no cascading config issues
+- **Audit-friendly:** All calls logged centrally, not distributed
+
 ## Quick Start
 
 ### 1. Get an API Key
@@ -95,6 +138,10 @@ The tool returns:
 - **requirements.txt** — Python dependencies (`mcp`, `requests`)
 - **__init__.py** — Python package marker
 - **LICENSE** — MIT License
+
+## Full API Documentation
+
+For the complete HTTP API contract (request/response schemas, error codes, detailed examples), see the [HTTP API documentation](https://github.com/99blakeD99/FCAHandbookHarnessImplementation/tree/main/http_api#http-api-schema-for-fca-handbook-harness) in the private implementation repository.
 
 ## Support
 

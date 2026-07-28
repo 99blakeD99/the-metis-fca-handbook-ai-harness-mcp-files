@@ -18,10 +18,8 @@ from mcp.server.fastmcp import Context, FastMCP
 BASE_URL = os.environ.get("METIS_BASE_URL", "https://fcahandbookharnessimplementation.onrender.com")
 API_KEY = os.environ.get("METIS_API_KEY")
 
-# "message" events on a full run: one per node (triage_gate, extract_features,
-# check_terminology, embed_question, retrieve_entries, analyze_compliance,
-# reporting) plus the final "Analysis complete" — see schema.md's "Progress
-# Notifications" section. Just a hint for the progress indicator, not a hard
+# "message" events on a full run: one per reasoning node (7-8 total, including
+# final "Analysis complete"). Just a hint for the progress indicator, not a hard
 # guarantee — a triage rejection ends after step 1, with an error, not 8.
 _EXPECTED_PROGRESS_STEPS = 8
 

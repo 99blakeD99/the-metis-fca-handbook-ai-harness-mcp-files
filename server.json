@@ -1,0 +1,52 @@
+{
+  "name": "Metis FCA Handbook AI Harness",
+  "version": "3.0.0",
+  "description": "MCP server for semantic FCA Handbook compliance analysis. Evaluate which FCA Handbook entries apply to a product, service, or firm with verbatim citations and structured compliance reasoning.",
+  "author": "Metis",
+  "homepage": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files.git"
+  },
+  "packages": {
+    "python": {
+      "version": "3.8+",
+      "index_urls": ["https://pypi.org/simple"]
+    }
+  },
+  "mcpServers": {
+    "fca-handbook-harness": {
+      "command": "python",
+      "args": ["-m", "mcp_server"],
+      "environment": {
+        "METIS_API_KEY": "required: API key from account dashboard (format: sk_live_...)",
+        "METIS_BASE_URL": "optional: defaults to https://fcahandbookharnessimplementation.onrender.com"
+      }
+    }
+  },
+  "capabilities": {
+    "tools": {
+      "evaluate_fca_handbook_applicability": {
+        "input": {
+          "user_input": "string (required, max 5000 chars): Everything together — firm/product/service details and compliance question",
+          "analysis_mode": "string (optional, 'quick' or 'full', default 'quick')"
+        },
+        "output": {
+          "summary": "string",
+          "entry_analysis": "array",
+          "obligations": "object",
+          "gaps": "array",
+          "refinement_suggestions": "array",
+          "citations": "array",
+          "tokens": "object"
+        }
+      }
+    }
+  },
+  "pricing": {
+    "model": "flat_rate",
+    "cost_per_call": "£7.95",
+    "billing_account": "Stripe (paid accounts only)"
+  }
+}

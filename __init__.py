@@ -1,10 +1,9 @@
-"""HTTP API and MCP integration for Metis FCA Handbook AI Harness.
+"""MCP server for Metis FCA Handbook AI Harness.
 
 This package provides:
-- mcp_server.py: MCP tool wrapping the HTTP /v1/analyze endpoint
-- schema.md: Authoritative API contract
-- tool.json: Tool schema for registries
-- setup-guide.md: Integration instructions
+- mcp_server.py: MCP server implementation
+- tool.json: Tool schema for registries and LLMs
+- requirements.txt: Python dependencies (mcp, requests)
 
-See README.md for getting started.
+See README.md for setup and usage instructions.
 """
