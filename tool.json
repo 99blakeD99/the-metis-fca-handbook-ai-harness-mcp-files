@@ -1,31 +1,14 @@
 {
   "name": "evaluate_fca_handbook_applicability",
   "version": "3.0.0",
-  "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions. Uses Claude internally; usage is billed to the account owning the API key (no mark-up on tokens).",
-
-  "setup": {
-    "required": true,
-    "instructions": "An admin generates an API key from the account dashboard (paid/Stripe accounts only). Set it as the METIS_API_KEY environment variable and use it as a Bearer token."
-  },
-
-  "endpoint": {
-    "method": "POST",
-    "url": "https://fcahandbookharnessimplementation.onrender.com/v1/analyze",
-    "authentication": {
-      "type": "bearer",
-      "bearer_token": "API key from the account dashboard (METIS_API_KEY env var), format sk_live_..."
-    },
-    "content_type": "application/json",
-    "streaming": "Always streams (Server-Sent Events). There is no non-streaming mode.",
-    "charging": "A flat £7.95 is charged immediately on completion, regardless of outcome quality. No mark-up on tokens."
-  },
+  "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions.",
 
   "design_principles": {
     "single_input_field": "There is exactly one input field: user_input (max 5000 characters). No entity_description/question/context split. Put everything in one piece of text.",
     "literal_then_semantic": "The Harness's Node 2 semantically parses your one user_input blob into structured fields (entity type, the question, etc.) for its own internal pipeline. Be explicit about what you're asking — e.g. end with a clear question — since extraction quality depends on it.",
     "stateless": "Each request is independent. The calling LLM manages any multi-turn conversation; the Harness has no memory of previous calls.",
     "one_shot": "One complete analysis per request. To refine, reformulate user_input using refinement_suggestions and call again.",
-    "streaming_only": "The response is always an SSE stream. You will receive 7-8 'message' events (one per reasoning node plus final 'Analysis complete'), interspersed with processing time, then the final 'analysis' or 'error' event. Total time: 60-120 seconds (quick mode) or longer (full mode). This is not a token-by-token reasoning stream."
+    "no_hidden_state": "No session ID, no history, no background jobs. Each call is independent and self-contained."
   },
 
   "input_schema": {
@@ -33,7 +16,7 @@
     "properties": {
       "user_input": {
         "type": "string",
-        "description": "Everything together, as one piece of text: firm type, regulatory status, products/services, key activities, target market, data handled, and the specific compliance question to answer. Be explicit about the question — e.g. end with 'Question: ...' — since a Haiku call semantically extracts it from this text, and vague phrasing degrades that extraction.",
+        "description": "Everything together, as one piece of text: firm type, regulatory status, products/services, key activities, target market, data handled, and the specific compliance question to answer. Be explicit about the question — e.g. end with 'Question: ...' — since extraction quality depends on it.",
         "maxLength": 5000,
         "required": true
       },
@@ -45,19 +28,10 @@
         "required": false
       }
     },
-    "required": ["user_input"],
-    "notes": "There is no separate entity_description, question, or context field. Sending extra fields has no effect — they're silently ignored."
+    "required": ["user_input"]
   },
 
   "output_schema": {
-    "format": "SSE stream: one 'message' event, then either 'error' or 'analysis'. Only these three event types occur on this endpoint (the web UI's separate /api/chat endpoint has a richer set that does NOT apply here).",
-    "sse_format": "data: {\"type\": \"<message|error|analysis>\", \"content\": <string|object>}\n\n",
-    "message_types": {
-      "message": "Progress notification: one per node (7-8 total in a typical run, including final 'Analysis complete'). Each contains a human-readable description of what's happening.",
-      "error": "Terminal. content is a plain string: budget-exceeded message, an out-of-scope rejection from the triage gate, or str(exception) for any other failure. No structured error code.",
-      "analysis": "Terminal, success case. content is the object described below."
-    },
-
     "analysis_content_schema": {
       "type": "object",
       "properties": {
@@ -71,11 +45,11 @@
         },
         "obligations": {
           "type": "object",
-          "description": "{high_confidence: [], conditional_obligations: [], low_confidence_or_tangential: []} — each an array of {obligation, type}."
+          "description": "{high_confidence: [], conditional_obligations: [], low_confidence_or_tangential: []} — each an array of obligation strings."
         },
         "gaps": {
           "type": "array",
-          "description": "Array of {gap, why_it_matters} — what the analysis couldn't resolve."
+          "description": "Array of {gap, why_it_matters} — what the analysis couldn't resolve from your input."
         },
         "refinement_suggestions": {
           "type": "array",
@@ -87,47 +61,22 @@
         },
         "tokens": {
           "type": "object",
-          "description": "{input, output, total} — token counts for this run, for cost/complexity transparency. Not the billed amount (that's a flat £7.95 regardless of token count)."
+          "description": "{input, output, total} — token counts for this run, for cost/complexity transparency. Not the billed amount."
         }
       }
     }
   },
 
-  "error_handling": {
-    "http_level": {
-      "401": "Missing/malformed Authorization header, or the API key is invalid/revoked.",
-      "404": "The key's account no longer exists.",
-      "422": "user_input missing from the request body.",
-      "500": "Deployment misconfiguration, not a caller issue."
-    },
-    "in_stream": "Everything else (budget exceeded, out-of-scope question, Harness failure) arrives as an SSE 'error' event over HTTP 200, not as an HTTP error status. There is no 429 rate limiting implemented.",
-    "recovery": "On 'error', read content as plain text and decide whether it's actionable (e.g. rephrase an out-of-scope question) or terminal (e.g. budget exceeded — nothing to retry)."
-  },
-
   "calling_pattern": {
-    "initial_shot": {
-      "step_1_collect_input": "Collect everything into one piece of text: firm/product/service details plus the specific compliance question.",
-      "step_2_call_api": "POST to /v1/analyze with the Bearer token and {\"user_input\": \"...\"}.",
-      "step_3_read_stream": "Parse SSE lines. Expect one 'message' event, then wait (60-120s) for 'analysis' or 'error'.",
-      "step_4_extract_results": "On 'analysis', read summary, entry_analysis, obligations, gaps, refinement_suggestions, citations, tokens."
-    },
-    "refinement_loop": {
-      "step_5_read_suggestions": "refinement_suggestions tells you what's worth asking next.",
-      "step_6_offer_to_user": "Offer the suggestion(s) to the user; let them decide whether to refine.",
-      "step_7_reformulate_and_repeat": "If refining, weave the new detail into a single new user_input string and call again — a new, independent request. No history is kept."
-    },
-    "key_points": "The calling LLM owns the conversation. The Harness is one-shot and stateless. analysis_mode defaults to 'quick'; ask the user if 'full' seems warranted (they're weighing a significant decision, or quick's summary left real gaps) rather than defaulting to it — it takes longer. There is no rate limiting to plan around today."
-  },
-
-  "examples": {
-    "curl_request": "curl -N -X POST https://fcahandbookharnessimplementation.onrender.com/v1/analyze \\\n  -H 'Authorization: Bearer $METIS_API_KEY' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"user_input\": \"Robo-advisor platform, £500k-£1M portfolios, retail investors, third-party custodian. Question: What FCA authorisation and permissions do we need?\"\n  }'",
-
-    "python_request": "import json\nimport requests\nimport os\n\napi_key = os.getenv('METIS_API_KEY')\nresponse = requests.post(\n    'https://fcahandbookharnessimplementation.onrender.com/v1/analyze',\n    headers={'Authorization': f'Bearer {api_key}'},\n    json={\n        'user_input': 'Robo-advisor platform... Question: What FCA authorisation do we need?'\n    },\n    stream=True,\n    timeout=180,\n)\n\nresult = None\nfor line in response.iter_lines():\n    if not line or not line.startswith(b'data:'):\n        continue\n    event = json.loads(line[len(b'data:'):].decode('utf-8'))\n    if event['type'] == 'analysis':\n        result = event['content']\n    elif event['type'] == 'error':\n        raise RuntimeError(event['content'])\n\nprint(result['summary'])\nprint('Refinement suggestions:', result['refinement_suggestions'])\nprint('Tokens used:', result['tokens']['total'])"
+    "step_1_collect_input": "Gather all relevant context into one user_input string: the firm/product/service details plus the specific compliance question.",
+    "step_2_call_tool": "Call evaluate_fca_handbook_applicability with user_input and optional analysis_mode.",
+    "step_3_read_response": "Parse the response object. On success, read summary, entry_analysis, obligations, gaps, refinement_suggestions, citations, tokens.",
+    "step_4_act_on_suggestions": "refinement_suggestions tells you what's worth asking next. If refining, weave the new detail into a fresh user_input and call again — a new, independent request.",
+    "key_points": "The calling LLM owns the conversation. The Harness is one-shot and stateless. analysis_mode defaults to 'quick'; ask the user if 'full' seems warranted (they're weighing a significant decision, or quick's summary left real gaps) rather than defaulting to it — it takes longer."
   },
 
   "key_insights": [
     "user_input is required; analysis_mode ('quick' or 'full', default 'quick') is optional. No entity_description/question/context split.",
-    "This is NOT a token-by-token reasoning stream. It's one 'message' event, a long wait, then the final 'analysis' or 'error' event.",
     "Be explicit about the question inside user_input — a Haiku call semantically extracts it, and vague phrasing produces worse retrieval.",
     "refinement_suggestions tell you what to ask next; you decide whether to refine or conclude.",
     "tokens is for cost/complexity transparency only — billing is a flat £7.95 per call regardless of token count.",
