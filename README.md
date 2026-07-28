@@ -26,6 +26,8 @@ Experience the Harness interactively before integrating:
 https://fcahandbookharnessimplementation.onrender.com
 ```
 
+Email `the-metis-fca-handbook-ai-harness@jbmd.co.uk` and request a free temporary Access Code.
+
 Ask compliance questions in natural language and watch each reasoning step unfold in real-time.
 
 
@@ -54,21 +56,11 @@ The Harness follows a modular, composable design:
 
 This aligns with fundamental software architecture principles: **composition of stateless services**, not distributed monoliths.
 
-## Integration Methods
-
-### HTTP API
-
-**Endpoint:** `POST /v1/analyze`
-
-Send a JSON request with your compliance question and context. Returns structured analysis with FCA Handbook citations.
-
-See [`schema.md`](./schema.md) for complete request/response schema, error codes, and examples.
-
-### MCP (Model Context Protocol)
+## MCP Integration
 
 **Tool name:** `evaluate_fca_handbook_applicability`
 
-Integrate the Harness as a composable tool in Claude or other MCP-compatible agents. See [`schema.md`](./schema.md) for MCP configuration and usage examples.
+Integrate the Harness as a composable tool in Claude or other MCP-compatible agents. See [`schema.md`](./schema.md) for the complete API contract and configuration details.
 
 ## Use Cases
 
@@ -147,13 +139,6 @@ Create the file if it doesn't exist.
 Replace `/path/to/mcp_server.py` with the actual path to the file (or use a virtual environment wrapper). Optionally add `"METIS_BASE_URL"` to the `env` object if you need to override the default deployment URL.
 
 Then restart Claude Desktop. The `evaluate_fca_handbook_applicability` tool will be available to use in agent workflows.
-
-### 4. Try It Live
-
-Visit the web UI interactively at:
-```
-https://fcahandbookharnessimplementation.onrender.com
-```
 
 ## Files in This Folder
 
