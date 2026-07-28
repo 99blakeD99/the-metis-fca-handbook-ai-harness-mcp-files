@@ -2,19 +2,19 @@
   "$schema": "https://registry.modelcontextprotocol.io/schema.json",
   "name": "io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
   "version": "3.0.0",
-  "description": "MCP server for semantic FCA Handbook compliance analysis. Evaluate which FCA Handbook entries apply to a product, service, or firm with verbatim citations and structured compliance reasoning.",
-  "author": "Metis",
+  "description": "MCP server for FCA Handbook compliance analysis with verbatim citations.",
   "license": "MIT",
-  "homepage": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
   "repository": {
     "type": "git",
-    "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files.git"
+    "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files.git",
+    "source": "github"
   },
   "packages": [
     {
       "type": "python",
-      "language": "python",
-      "versionRange": ">=3.8"
+      "registryType": "pypi",
+      "identifier": "fca-handbook-harness-mcp",
+      "transport": "stdio"
     }
   ]
 }
