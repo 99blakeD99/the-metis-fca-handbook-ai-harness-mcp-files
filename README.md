@@ -20,6 +20,18 @@ Use this tool to analyze FCA Handbook applicability for a product, service, or f
 
 - **AI Accessible** Integrates easily with AI workflows and agents. Your LLM can use it as a tool.
 
+## Try the Harness Live
+
+Experience the Harness interactively before integrating:
+
+```
+https://fcahandbookharnessimplementation.onrender.com
+```
+
+Email `the-metis-fca-handbook-ai-harness@jbmd.co.uk` and request a free temporary Access Code.
+
+Ask compliance questions in natural language and watch each reasoning step unfold in real-time.
+
 ## Design Principles
 
 The Harness is built on proven principles:
@@ -85,7 +97,7 @@ Add this server entry (create the file if it doesn't exist):
   "mcpServers": {
     "fca-handbook-harness": {
       "command": "python",
-      "args": ["/path/to/mcp_server.py"],
+      "args": ["-m", "mcp_server"],
       "env": {
         "METIS_API_KEY": "sk_live_..."
       }
@@ -94,7 +106,7 @@ Add this server entry (create the file if it doesn't exist):
 }
 ```
 
-Replace `/path/to/mcp_server.py` with the actual path to the file.
+Ensure the `mcp_server.py` file is in your Python path or the working directory where Claude Desktop runs.
 
 ### 4. Restart Claude Desktop
 
@@ -134,10 +146,14 @@ The tool returns:
 
 ## Files
 
-- **mcp_server.py** — MCP server implementation
+- **mcp_server.py** — MCP server implementation (main entry point)
+- **tool.json** — Tool schema definition for LLMs and registries
+- **server.json** — MCP registry manifest (registry.modelcontextprotocol.io format)
 - **requirements.txt** — Python dependencies (`mcp`, `requests`)
 - **__init__.py** — Python package marker
+- **README.md** — This file
 - **LICENSE** — MIT License
+- **.gitignore** — Git ignore rules
 
 ## Full API Documentation
 
