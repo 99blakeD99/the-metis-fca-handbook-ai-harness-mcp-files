@@ -1,0 +1,70 @@
+# FCA Handbook Harness Implementation Repository
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+*.iml
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Large data files (managed separately)
+data/FCA_ScrapedHandbook_Text_And_Embeddings.json
+data/FCA_ScrapedHandbook_Preembedding.json
+*.json.bak
+
+# Generated image files
+images/image-jpgs/
+
+# Audit logs and local files
+logs/
+interactions.json
+analytics.json
+usage.json
+*.log
+temp.md
+local_config.py
+.env
+.env.mcp-test
+
+# MCP server config (contains API keys passed via --env)
+.mcp.json
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
