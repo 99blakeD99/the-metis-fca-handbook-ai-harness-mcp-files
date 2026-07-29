@@ -1,20 +1,35 @@
 {
-  "$schema": "https://registry.modelcontextprotocol.io/schema.json",
-  "name": "io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
-  "version": "3.0.0",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp",
   "description": "MCP server for FCA Handbook compliance analysis with verbatim citations.",
-  "license": "MIT",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files.git",
+    "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
     "source": "github"
   },
+  "version": "0.1.1",
   "packages": [
     {
-      "type": "python",
       "registryType": "pypi",
       "identifier": "fca-handbook-harness-mcp",
-      "transport": "stdio"
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Bearer token from an account's API Keys dashboard",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "METIS_API_KEY"
+        },
+        {
+          "description": "Base URL of the Metis Harness deployment (optional, defaults to live Render deployment)",
+          "isRequired": false,
+          "format": "string",
+          "name": "METIS_BASE_URL"
+        }
+      ]
     }
   ]
 }

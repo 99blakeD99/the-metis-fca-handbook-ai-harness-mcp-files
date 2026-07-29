@@ -1,5 +1,7 @@
 # Metis FCA Handbook AI Harness — MCP Server
 
+<!-- mcp-name: io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp -->
+
 An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into Claude Desktop and other MCP-compatible agents.
 
 **Tool name:** `evaluate_fca_handbook_applicability`
@@ -75,10 +77,10 @@ https://fcahandbookharnessimplementation.onrender.com
 - Navigate to **API Keys** and generate a new key
 - Save it securely
 
-### 2. Install Dependencies
+### 2. Install the MCP Server
 
 ```bash
-pip install -r requirements.txt
+pip install fca-handbook-harness-mcp
 ```
 
 ### 3. Configure Claude Desktop
@@ -96,8 +98,7 @@ Add this server entry (create the file if it doesn't exist):
 {
   "mcpServers": {
     "fca-handbook-harness": {
-      "command": "python",
-      "args": ["-m", "mcp_server"],
+      "command": "fca-handbook-harness-mcp",
       "env": {
         "METIS_API_KEY": "sk_live_..."
       }
@@ -106,7 +107,7 @@ Add this server entry (create the file if it doesn't exist):
 }
 ```
 
-Ensure the `mcp_server.py` file is in your Python path or the working directory where Claude Desktop runs.
+Replace `sk_live_...` with your actual API key from your Metis account.
 
 ### 4. Restart Claude Desktop
 
