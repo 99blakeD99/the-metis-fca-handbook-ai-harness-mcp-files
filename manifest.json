@@ -1,0 +1,52 @@
+{
+  "manifest_version": "0.3",
+  "name": "fca-handbook-harness-mcp",
+  "display_name": "The Metis FCA Handbook AI Harness",
+  "version": "0.1.1",
+  "description": "MCP server for FCA Handbook compliance analysis with verbatim citations.",
+  "author": {
+    "name": "Blake Dempster",
+    "email": "blake.dempster@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files"
+  },
+  "homepage": "https://fcahandbookharnessimplementation.onrender.com/",
+  "license": "MIT",
+  "keywords": ["mcp", "fca", "compliance", "regulatory", "handbook"],
+  "server": {
+    "type": "python",
+    "entry_point": "mcp_server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "mcp_server.py"],
+      "env": {
+        "METIS_API_KEY": "${user_config.metis_api_key}",
+        "METIS_BASE_URL": "${user_config.metis_base_url}"
+      }
+    }
+  },
+  "tools_generated": true,
+  "user_config": {
+    "metis_api_key": {
+      "type": "string",
+      "title": "Metis API Key",
+      "description": "Bearer token from your Metis account's API Keys dashboard. Every call is billed to this account.",
+      "sensitive": true,
+      "required": true
+    },
+    "metis_base_url": {
+      "type": "string",
+      "title": "Metis Base URL",
+      "description": "Base URL of the Metis Harness deployment. Leave as default unless self-hosting.",
+      "default": "https://fcahandbookharnessimplementation.onrender.com",
+      "required": false
+    }
+  },
+  "compatibility": {
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}

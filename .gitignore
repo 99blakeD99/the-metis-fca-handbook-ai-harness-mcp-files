@@ -10,6 +10,9 @@ __pycache__/
 dist/
 build/
 
+# Built MCPB bundle (built on demand via `mcpb pack`)
+*.mcpb
+
 # Virtual environments
 venv/
 ENV/
