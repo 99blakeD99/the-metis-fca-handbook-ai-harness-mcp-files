@@ -6,12 +6,12 @@
     "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "fca-handbook-harness-mcp",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "transport": {
         "type": "stdio"
       },

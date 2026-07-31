@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "fca-handbook-harness-mcp",
   "display_name": "The Metis FCA Handbook AI Harness",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "MCP server for FCA Handbook compliance analysis with verbatim citations.",
   "author": {
     "name": "Blake Dempster",
