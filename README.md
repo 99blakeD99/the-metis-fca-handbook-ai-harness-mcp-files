@@ -2,6 +2,8 @@
 
 <!-- mcp-name: io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp -->
 
+[![smithery badge](https://smithery.ai/badge/blakeD99/the-metis-fca-handbook-ai-harness-mcp)](https://smithery.ai/servers/blakeD99/the-metis-fca-handbook-ai-harness-mcp)
+
 An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into Claude Desktop and other MCP-compatible agents.
 
 **Tool name:** `evaluate_fca_handbook_applicability`
