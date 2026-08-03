@@ -2,13 +2,13 @@
 
 <!-- mcp-name: io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp -->
 
-[![smithery badge](https://smithery.ai/badge/blakeD99/the-metis-fca-handbook-ai-harness-mcp)](https://smithery.ai/servers/blakeD99/the-metis-fca-handbook-ai-harness-mcp)
-
 An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into Claude Desktop and other MCP-compatible agents.
 
-**Tool name:** `evaluate_fca_handbook_applicability`
+## Tools
 
-Use this tool to analyze FCA Handbook applicability for a product, service, or firm. Returns structured compliance reasoning with verbatim handbook citations.
+### `evaluate_fca_handbook_applicability`
+
+Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions.
 
 ## Why choose The Metis FCA Handbook AI Harness?
 
