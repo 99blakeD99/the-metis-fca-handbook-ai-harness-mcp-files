@@ -135,7 +135,7 @@ The tool returns:
 
 **Tool not appearing in Claude Desktop:**
 - Verify the config file path (platform-specific, see above)
-- Check that `mcp_server.py` path is absolute and correct
+- Confirm `fca-handbook-harness-mcp` resolves on the command line (`which fca-handbook-harness-mcp` / `where fca-handbook-harness-mcp`). Claude Desktop launches with a minimal environment and may not see the same PATH as your shell — if the command does not resolve, replace `"command": "fca-handbook-harness-mcp"` with the absolute path from that lookup
 - Restart Claude Desktop (not just reload)
 
 **401 Unauthorized:**
