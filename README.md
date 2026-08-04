@@ -158,10 +158,6 @@ The tool returns:
 - **LICENSE** — MIT License
 - **.gitignore** — Git ignore rules
 
-## Full API Documentation
-
-For the complete HTTP API contract (request/response schemas, error codes, detailed examples), see the [HTTP API documentation](https://github.com/99blakeD99/FCAHandbookHarnessImplementation/tree/main/http_api#http-api-schema-for-fca-handbook-harness) in the private implementation repository.
-
 ## Support
 
 For questions or issues, contact: `the-metis-fca-handbook-ai-harness@jbmd.co.uk`
