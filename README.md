@@ -4,6 +4,8 @@
 
 An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into your AI workflow. MCP is supported by Claude, OpenAI, Gemini, and most desktop/IDE MCP clients (Cursor, Windsurf, Cline, and others) — this README uses Claude Desktop as a fully worked example; adjust the configuration steps to fit your own client.
 
+**Source & full documentation:** [github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files](https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files)
+
 ## Tools
 
 ### `evaluate_fca_handbook_applicability`
@@ -153,7 +155,7 @@ The tool returns:
 - **tool.json** — Tool schema definition for LLMs and registries
 - **server.json** — MCP registry manifest (registry.modelcontextprotocol.io format)
 - **requirements.txt** — Python dependencies (`mcp`, `requests`)
-- **__init__.py** — Python package marker
+- **`__init__.py`** — Python package marker
 - **README.md** — This file
 - **LICENSE** — MIT License
 - **.gitignore** — Git ignore rules
