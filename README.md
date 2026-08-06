@@ -2,7 +2,7 @@
 
 <!-- mcp-name: io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp -->
 
-An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into Claude Desktop and other MCP-compatible agents.
+An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into your AI workflow. MCP is supported by Claude, OpenAI, Gemini, and most desktop/IDE MCP clients (Cursor, Windsurf, Cline, and others) — this README uses Claude Desktop as a fully worked example; adjust the configuration steps to fit your own client.
 
 ## Tools
 
@@ -85,11 +85,11 @@ https://fcahandbookharnessimplementation.onrender.com
 pip install fca-handbook-harness-mcp
 ```
 
-### 3. Configure Claude Desktop
+### 3. Configure your MCP client
 
-Edit your Claude Desktop config file:
+This section walks through Claude Desktop as a fully worked example. The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients (Claude Code, Cursor, Windsurf, Cline, and others) — but the config file location and restart step are Claude Desktop's specifically. If you are using a different client, including one with a GUI-based connector flow (some OpenAI and Gemini integrations work this way) rather than a JSON config file, consult that client's own documentation for where to add a server.
 
-**File location:**
+**Claude Desktop file location:**
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **Linux:** `~/.config/Claude/claude_desktop_config.json`
@@ -111,9 +111,9 @@ Add this server entry (create the file if it doesn't exist):
 
 Replace `sk_live_...` with your actual API key from your Metis account.
 
-### 4. Restart Claude Desktop
+### 4. Restart your MCP client
 
-Quit and restart Claude Desktop. The `evaluate_fca_handbook_applicability` tool will now be available in agent workflows.
+For Claude Desktop: quit and restart the app. Other clients reload MCP connections differently — check your client's documentation if unsure. Once connected, the `evaluate_fca_handbook_applicability` tool will be available in agent workflows.
 
 ## Using the Tool
 
@@ -133,10 +133,10 @@ The tool returns:
 
 ## Troubleshooting
 
-**Tool not appearing in Claude Desktop:**
+**Tool not appearing (Claude Desktop; the same class of issue applies to most desktop MCP clients):**
 - Verify the config file path (platform-specific, see above)
-- Confirm `fca-handbook-harness-mcp` resolves on the command line (`which fca-handbook-harness-mcp` / `where fca-handbook-harness-mcp`). Claude Desktop launches with a minimal environment and may not see the same PATH as your shell — if the command does not resolve, replace `"command": "fca-handbook-harness-mcp"` with the absolute path from that lookup
-- Restart Claude Desktop (not just reload)
+- Confirm `fca-handbook-harness-mcp` resolves on the command line (`which fca-handbook-harness-mcp` / `where fca-handbook-harness-mcp`). Desktop MCP clients typically launch with a minimal environment and may not see the same PATH as your shell — if the command does not resolve, replace `"command": "fca-handbook-harness-mcp"` with the absolute path from that lookup
+- Restart your MCP client (not just reload)
 
 **401 Unauthorized:**
 - Verify `METIS_API_KEY` is set in the config `env`
