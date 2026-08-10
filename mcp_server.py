@@ -36,11 +36,12 @@ async def evaluate_fca_handbook_applicability(
     Use for questions about FCA authorisation, permissions, or obligations
     for a specific firm/product/service.
 
-    **Important: This call takes 90+ seconds to complete.** The Harness reports progress
-    messages as it runs through each reasoning node. Relay these messages to the user
-    as they arrive — do not wait silently. They contain genuinely useful detail about
-    what is happening (e.g. which stage of reasoning is underway), not filler. The
-    progress updates are the primary way the user knows the tool is working.
+    **CRITICAL: This call takes 90+ seconds to complete and streams progress messages.**
+    You MUST display each progress message to the user as it arrives. Do NOT wait
+    silently for the result. Silently waiting makes the user think the tool is broken.
+    The progress messages are not filler — they contain essential detail about what the
+    Harness is doing (which reasoning node is running, what it found, etc.). Your response
+    MUST actively incorporate and relay each message, not just the final result.
 
     Before calling: check whether you already have (from this conversation,
     documents you were given, or other tools) grounded answers to these six
