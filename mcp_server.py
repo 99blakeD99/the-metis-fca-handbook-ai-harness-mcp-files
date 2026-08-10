@@ -34,10 +34,13 @@ async def evaluate_fca_handbook_applicability(
 
     Calls a live compliance reasoning run, billed to the configured account.
     Use for questions about FCA authorisation, permissions, or obligations
-    for a specific firm/product/service. Reports progress as it runs — show
-    these to the user if your host displays them, they contain genuinely
-    useful detail about what is happening (e.g. which stage of reasoning is
-    underway), not filler.
+    for a specific firm/product/service.
+
+    **Important: This call takes 90+ seconds to complete.** The Harness reports progress
+    messages as it runs through each reasoning node. Relay these messages to the user
+    as they arrive — do not wait silently. They contain genuinely useful detail about
+    what is happening (e.g. which stage of reasoning is underway), not filler. The
+    progress updates are the primary way the user knows the tool is working.
 
     Before calling: check whether you already have (from this conversation,
     documents you were given, or other tools) grounded answers to these six
