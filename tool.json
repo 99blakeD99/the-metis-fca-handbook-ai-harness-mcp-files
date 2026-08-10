@@ -1,7 +1,7 @@
 {
   "name": "evaluate_fca_handbook_applicability",
   "version": "3.0.0",
-  "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions.",
+  "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions. CRITICAL: This tool streams progress messages as it runs (one per reasoning node). You MUST display each message to the user as it arrives — do not wait silently. Silent waiting makes the user think the tool is broken. Actively incorporate the progress messages into your response, not just the final result.",
 
   "design_principles": {
     "single_input_field": "There is exactly one input field: user_input (max 5000 characters). No entity_description/question/context split. Put everything in one piece of text.",

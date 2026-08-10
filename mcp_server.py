@@ -104,6 +104,12 @@ async def evaluate_fca_handbook_applicability(
             error = event["content"]
         elif event_type == "message" and ctx is not None:
             step += 1
+            # report_progress is a silent no-op unless the client opted into
+            # progress tracking (sent a progressToken on the tool call) — most
+            # hosts do not. ctx.info() sends an unconditional logging
+            # notification instead, so the message actually reaches the
+            # client regardless of host support for progress tracking.
+            await ctx.info(event["content"])
             await ctx.report_progress(
                 progress=step, total=_EXPECTED_PROGRESS_STEPS, message=event["content"]
             )
