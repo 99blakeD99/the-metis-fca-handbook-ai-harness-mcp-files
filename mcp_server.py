@@ -36,12 +36,11 @@ async def evaluate_fca_handbook_applicability(
     Use for questions about FCA authorisation, permissions, or obligations
     for a specific firm/product/service.
 
-    **CRITICAL: This call takes 90+ seconds to complete and streams progress messages.**
-    You MUST display each progress message to the user as it arrives. Do NOT wait
-    silently for the result. Silently waiting makes the user think the tool is broken.
-    The progress messages are not filler — they contain essential detail about what the
-    Harness is doing (which reasoning node is running, what it found, etc.). Your response
-    MUST actively incorporate and relay each message, not just the final result.
+    This call takes 60-120+ seconds (longer in 'full' mode). Tell the user
+    up front that you are starting a long-running call, before you call the
+    tool — do not go silent. The Harness attempts to stream progress messages
+    as each reasoning node completes - if you receive them, relay each one
+    to the user as it arrives — they contain genuine detail, not filler.
 
     Before calling: check whether you already have (from this conversation,
     documents you were given, or other tools) grounded answers to these six
@@ -63,8 +62,9 @@ async def evaluate_fca_handbook_applicability(
     rather than just relaying the suggestion to the user as a question.
     Do not speculate or infer plausible-sounding detail you do not actually
     have to fill a gap — that reintroduces the hallucination risk this
-    Harness exists to avoid, one level up. Only ask the user for whatever's
-    left that you genuinely do not know.
+    Harness exists to avoid, one level up. For whatever's left that you
+    genuinely do not know, ask the user directly and say you will call the
+    tool again once they answer — do not just list the gaps and stop.
 
     Args:
         user_input: Everything together as one piece of text (up to 5000

@@ -1,7 +1,7 @@
 {
   "name": "evaluate_fca_handbook_applicability",
   "version": "3.0.0",
-  "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions. CRITICAL: This tool streams progress messages as it runs (one per reasoning node). You MUST display each message to the user as it arrives — do not wait silently. Silent waiting makes the user think the tool is broken. Actively incorporate the progress messages into your response, not just the final result.",
+  "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions. This call takes 60-120+ seconds (longer in 'full' mode) — tell the user up front that you are starting a long-running call, do not go silent. The Harness attempts to stream progress messages as each reasoning node completes; if you receive them, relay each one to the user as it arrives.",
 
   "design_principles": {
     "single_input_field": "There is exactly one input field: user_input (max 5000 characters). No entity_description/question/context split. Put everything in one piece of text.",
@@ -71,7 +71,7 @@
     "step_1_collect_input": "Gather all relevant context into one user_input string: the firm/product/service details plus the specific compliance question.",
     "step_2_call_tool": "Call evaluate_fca_handbook_applicability with user_input and optional analysis_mode.",
     "step_3_read_response": "Parse the response object. On success, read summary, entry_analysis, obligations, gaps, refinement_suggestions, citations, tokens.",
-    "step_4_act_on_suggestions": "refinement_suggestions tells you what's worth asking next. If refining, weave the new detail into a fresh user_input and call again — a new, independent request.",
+    "step_4_act_on_suggestions": "refinement_suggestions tells you what's worth asking next. If you already have grounded information for a gap, fold it into a fresh user_input and call again yourself. For whatever's left that you genuinely do not know, ask the user directly and say you will call the tool again once they answer — do not just list the gaps and stop.",
     "key_points": "The calling LLM owns the conversation. The Harness is one-shot and stateless. analysis_mode defaults to 'quick'; ask the user if 'full' seems warranted (they're weighing a significant decision, or quick's summary left real gaps) rather than defaulting to it — it takes longer."
   },
 
