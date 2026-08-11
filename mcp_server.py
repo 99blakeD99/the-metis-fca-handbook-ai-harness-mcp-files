@@ -74,8 +74,12 @@ async def evaluate_fca_handbook_applicability(
             above for why all six matter.
         analysis_mode: 'quick' (default, ~60-120 seconds) for a fast pass, or
             'full' (longer) for detailed conditional reasoning — conditions,
-            interactions between rules, and second-order implications. Ask
-            the user which they want if it is not obvious; default to 'quick'.
+            interactions between rules, and second-order implications. Use
+            'quick' for the first call — the user has no basis yet to judge
+            which they want. If refining after gaps or refinement_suggestions
+            from a prior 'quick' call, 'full' may resolve them more
+            thoroughly; confirm with the user before switching to 'full'
+            rather than deciding unilaterally, since it takes longer.
     """
     if not API_KEY:
         raise RuntimeError("METIS_API_KEY is not set in the MCP server's environment")

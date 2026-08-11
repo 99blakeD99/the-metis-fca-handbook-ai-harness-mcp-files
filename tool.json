@@ -72,7 +72,7 @@
     "step_2_call_tool": "Call evaluate_fca_handbook_applicability with user_input and optional analysis_mode.",
     "step_3_read_response": "Parse the response object. On success, read summary, entry_analysis, obligations, gaps, refinement_suggestions, citations, tokens.",
     "step_4_act_on_suggestions": "refinement_suggestions tells you what's worth asking next. If you already have grounded information for a gap, fold it into a fresh user_input and call again yourself. For whatever's left that you genuinely do not know, ask the user directly and say you will call the tool again once they answer — do not just list the gaps and stop.",
-    "key_points": "The calling LLM owns the conversation. The Harness is one-shot and stateless. analysis_mode defaults to 'quick'; ask the user if 'full' seems warranted (they're weighing a significant decision, or quick's summary left real gaps) rather than defaulting to it — it takes longer."
+    "key_points": "The calling LLM owns the conversation. The Harness is one-shot and stateless. Use 'quick' for the first call — the user has no basis yet to judge which mode they want. If refining after gaps or refinement_suggestions from a prior 'quick' call, 'full' may resolve them more thoroughly than another 'quick' pass; confirm with the user before switching to 'full' rather than deciding unilaterally, since it takes longer."
   },
 
   "key_insights": [
