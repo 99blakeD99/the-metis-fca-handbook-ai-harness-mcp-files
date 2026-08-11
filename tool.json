@@ -1,6 +1,5 @@
 {
   "name": "evaluate_fca_handbook_applicability",
-  "version": "3.0.0",
   "description": "Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness. One-shot: no session, no conversation state. Supports quick mode (60-120 seconds, default) and full mode (longer, more detailed). Returns a compliance report with verbatim citations, gaps, and refinement suggestions. This call takes 60-120+ seconds (longer in 'full' mode) — tell the user up front that you are starting a long-running call, do not go silent. The Harness attempts to stream progress messages as each reasoning node completes; if you receive them, relay each one to the user as it arrives.",
 
   "design_principles": {

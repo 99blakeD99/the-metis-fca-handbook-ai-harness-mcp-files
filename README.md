@@ -152,13 +152,17 @@ The tool returns:
 ## Files
 
 - **mcp_server.py** — MCP server implementation (main entry point)
+- **pyproject.toml** — pypi package manifest
 - **tool.json** — Tool schema definition for LLMs and registries
 - **server.json** — MCP registry manifest (registry.modelcontextprotocol.io format)
+- **manifest.json** — MCPB/Smithery bundle manifest
 - **requirements.txt** — Python dependencies (`mcp`, `requests`)
+- **uv.lock** — Pinned dependency resolution for reproducible `uv run`
 - **`__init__.py`** — Python package marker
 - **README.md** — This file
 - **LICENSE** — MIT License
 - **.gitignore** — Git ignore rules
+- **.mcpbignore** — Files excluded from the MCPB bundle
 
 ## Support
 
@@ -167,5 +171,4 @@ For questions or issues, contact: `the-metis-fca-handbook-ai-harness@jbmd.co.uk`
 ---
 
 **Product:** Metis FCA Handbook AI Harness  
-**Version:** 3.0.0  
 **License:** MIT
