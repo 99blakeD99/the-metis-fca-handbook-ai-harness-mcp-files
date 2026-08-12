@@ -9,7 +9,6 @@ build/
 requirements.txt
 server.json
 server.json.backup
-tool.json
 
 # Not relevant to the bundle
 .gitignore

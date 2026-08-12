@@ -151,9 +151,8 @@ The tool returns:
 
 ## Files
 
-- **mcp_server.py** — MCP server implementation (main entry point)
+- **mcp_server.py** — MCP server implementation (main entry point; its docstring is the source of truth for the tool schema)
 - **pyproject.toml** — pypi package manifest
-- **tool.json** — Tool schema definition for LLMs and registries
 - **server.json** — MCP registry manifest (registry.modelcontextprotocol.io format)
 - **manifest.json** — MCPB/Smithery bundle manifest
 - **requirements.txt** — Python dependencies (`mcp`, `requests`)

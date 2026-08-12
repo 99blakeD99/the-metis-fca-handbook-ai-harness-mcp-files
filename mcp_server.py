@@ -30,11 +30,10 @@ mcp = FastMCP("Metis FCA Handbook AI Harness")
 async def evaluate_fca_handbook_applicability(
     user_input: str, analysis_mode: str = "quick", ctx: Context = None
 ) -> dict:
-    """Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbook AI Harness.
+    """Evaluate which FCA Handbook entries apply to a situation as input by the user, using the Metis FCA Handbook AI Harness.
 
     Calls a live compliance reasoning run, billed to the configured account.
-    Use for questions about FCA authorisation, permissions, or obligations
-    for a specific firm/product/service.
+    Use for questions involving the FCA Handbook, including authorisation, permissions, or obligations for a specific firm/product/service.
 
     This call takes 60-120+ seconds (longer in 'full' mode). Tell the user
     up front that you are starting a long-running call, before you call the
@@ -42,44 +41,53 @@ async def evaluate_fca_handbook_applicability(
     as each reasoning node completes - if you receive them, relay each one
     to the user as it arrives — they contain genuine detail, not filler.
 
-    Before calling: check whether you already have (from this conversation,
-    documents you were given, or other tools) grounded answers to these six
-    things — the specific compliance question, the product/service, who's
-    providing it (platform/adviser/bank/etc.), its key features, the target
-    market (retail/institutional/professional), and what data it handles.
-    If you are missing more than one or two, ask the user for them first
-    rather than calling with thin input. Every call is billed to the
-    account at a flat rate regardless of input quality, so a vague call
-    followed by a refinement round costs twice what one good call would
-    have.
+    First call: use analysis_mode='quick'. Before calling, check whether you
+    already have (from this conversation, documents you were given, or other
+    tools) grounded answers to these six things — the specific compliance
+    question, the product/service, who is providing it (platform/adviser/
+    bank/etc.), its key features, the target market (retail/institutional/
+    professional/customer segment), and what data it handles. If you are missing more than
+    one or two, ask the user for them first rather than calling with thin
+    input. Every call is billed at a flat rate regardless of input quality,
+    so a vague call incurs unnecessary cost.
 
-    The result includes refinement_suggestions — gaps the Harness couldn't
-    resolve from user_input alone, typically subtler than the six basics
-    above (e.g. a regulatory edge case, not a missing fact you could have
-    just asked for). If you already have grounded information addressing
-    one (from this conversation, documents you were given, or other tools
-    you've called), fold it into a new user_input and call again yourself,
-    rather than just relaying the suggestion to the user as a question.
-    Do not speculate or infer plausible-sounding detail you do not actually
-    have to fill a gap — that reintroduces the hallucination risk this
-    Harness exists to avoid, one level up. For whatever's left that you
-    genuinely do not know, ask the user directly and say you will call the
-    tool again once they answer — do not just list the gaps and stop.
+    The result
+    includes refinement_suggestions — gaps the Harness could not resolve
+    from user_input alone, typically subtler than the six basics above (e.g.
+    a regulatory edge case, not a missing fact you could have just asked
+    for). For each suggestion worth pursuing, get the grounded information —
+    retrieve it from this conversation, documents you were given, or other
+    tools if you already have it; otherwise ask the user directly. Do not
+    speculate or infer plausible-sounding detail you do not actually have —
+    that reintroduces the hallucination risk this Harness exists to avoid,
+    one level up.
+
+    Refining (second call onward): use analysis_mode='full'. Either way, before calling again, confirm with the user
+    that you are about to run a further 'full' pass with the refined input —
+    do not call again unilaterally, and do not just list the gaps and stop.
+    Repeat this pattern for further rounds if the new result still leaves
+    suggestions worth resolving.
+
+    The result's citations field contains verbatim quotes from the FCA
+    Handbook — this is a core part of what the Harness offers, not
+    generative invention, and distinct from the summary/obligations text. They can best be viewed as an Appendix.
+    Citations can be long, so ask the user whether they want the relevant
+    verbatim citations included, rather than omitting them by default as
+    mere detail.
 
     Args:
         user_input: Everything together as one piece of text (up to 5000
             characters) — the specific compliance question, the
-            product/service, who's providing it, its key features, the
-            target market, and what data it handles. See "Before calling"
-            above for why all six matter.
-        analysis_mode: 'quick' (default, ~60-120 seconds) for a fast pass, or
-            'full' (longer) for detailed conditional reasoning — conditions,
-            interactions between rules, and second-order implications. Use
-            'quick' for the first call — the user has no basis yet to judge
-            which they want. If refining after gaps or refinement_suggestions
-            from a prior 'quick' call, 'full' may resolve them more
-            thoroughly; confirm with the user before switching to 'full'
-            rather than deciding unilaterally, since it takes longer.
+            product/service, who is providing it, its key features, the
+            target market, and what data it handles. On later rounds, refine
+            all six using existing chat context and whatever additional
+            detail later rounds have gathered. See "First call" and
+            "Refining" above.
+        analysis_mode: 'quick' for the first call (default, ~60-120
+            seconds); 'full' (longer) for refined calls after the first —
+            detailed conditional reasoning: conditions, interactions
+            between rules, and second-order implications. See "Refining"
+            above for when to switch and why to confirm with the user first.
     """
     if not API_KEY:
         raise RuntimeError("METIS_API_KEY is not set in the MCP server's environment")
