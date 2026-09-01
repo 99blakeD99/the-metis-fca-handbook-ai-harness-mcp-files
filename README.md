@@ -89,11 +89,41 @@ pip install fca-handbook-harness-mcp
 
 ### 3. Configure your MCP client
 
-This section walks through Claude Desktop as a fully worked example. The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients (Claude Code, Cursor, Windsurf, Cline, and others) — but the config file location and restart step are Claude Desktop's specifically. If you are using a different client, including one with a GUI-based connector flow (some OpenAI and Gemini integrations work this way) rather than a JSON config file, consult that client's own documentation for where to add a server.
+The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients, but the config file location and restart step vary by client. Pick the one that matches what you are using.
 
-The Harness API key should be supplied at runtime from an environment variable or secrets manager, never hardcoded as a literal value in a configuration file that may be committed to a shared repository. The server supports this directly: it loads a `.env` file automatically (from the directory it runs in, or any parent), so `METIS_API_KEY` never needs to appear in the client config at all — the approach used below.
+**Important:** The Harness API key should be supplied at runtime from an environment variable or secrets manager, never hardcoded as a literal value in a configuration file that may be committed to a shared repository. The server supports this directly: it loads a `.env` file automatically, so `METIS_API_KEY` never needs to appear in the client config at all.
 
-**Claude Desktop file location:**
+#### 3a. Claude Code
+
+Claude Code (the Claude IDE extension) stores MCP configuration in your project's `.claude/settings.json`. This is project-local, not global — you configure it once per project.
+
+**File location:** `.claude/settings.json` (in your project root)
+
+Edit or create `.claude/settings.json` and add:
+
+```json
+{
+  "mcpServers": {
+    "fca-handbook-harness-mcp": {
+      "command": "fca-handbook-harness-mcp"
+    }
+  }
+}
+```
+
+Then create a `.env` file (in your project root) containing:
+
+```
+METIS_API_KEY=sk_live_...
+```
+
+Replace `sk_live_...` with your actual API key from your Metis account.
+
+**Restart:** Claude Code will detect the change and reload MCP connections automatically (or you can restart the IDE). Once connected, the `evaluate_fca_handbook_applicability` tool will be available.
+
+#### 3b. Claude Desktop
+
+**File location:**
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **Linux:** `~/.config/Claude/claude_desktop_config.json`
@@ -103,7 +133,7 @@ Add this server entry (create the file if it doesn't exist):
 ```json
 {
   "mcpServers": {
-    "fca-handbook-harness": {
+    "fca-handbook-harness-mcp": {
       "command": "fca-handbook-harness-mcp"
     }
   }
@@ -118,9 +148,15 @@ METIS_API_KEY=sk_live_...
 
 Replace `sk_live_...` with your actual API key from your Metis account. (If your client does not run the server from a directory you control — some GUI-based connector flows do not — fall back to an `env` block in the config above instead.)
 
-### 4. Restart your MCP client
+**Restart:** Quit and restart the Claude Desktop app. Once connected, the `evaluate_fca_handbook_applicability` tool will be available.
 
-For Claude Desktop: quit and restart the app. Other clients reload MCP connections differently — check your client's documentation if unsure. Once connected, the `evaluate_fca_handbook_applicability` tool will be available in agent workflows.
+#### 3c. Other Clients (Cursor, Windsurf, Cline, etc.)
+
+These clients typically use the same `mcpServers` JSON shape as Claude Desktop above. Consult your client's documentation for the config file location and restart procedure (some use GUI connectors rather than JSON files).
+
+### 4. Verify the connection
+
+Once restarted, you should see `evaluate_fca_handbook_applicability` available as a tool in your agent workflows. If it does not appear, check the Troubleshooting section below.
 
 ## Using the Tool
 
