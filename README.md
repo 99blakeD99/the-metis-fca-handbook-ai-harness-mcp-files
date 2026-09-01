@@ -2,7 +2,7 @@
 
 <!-- mcp-name: io.github.99blakeD99/the-metis-fca-handbook-ai-harness-mcp -->
 
-An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into your AI workflow. MCP is supported by Claude, OpenAI, Gemini, and most desktop/IDE MCP clients (Cursor, Windsurf, Cline, and others) — this README uses Claude Desktop as a fully worked example; adjust the configuration steps to fit your own client.
+An MCP (Model Context Protocol) server that integrates the Metis FCA Handbook AI Harness into your AI workflow. MCP is supported by Claude, OpenAI, Gemini, and most desktop/IDE MCP clients (Cursor, Windsurf, Cline, and others) — this README uses Claude Code and Claude Desktop as fully worked examples; adjust the configuration steps to fit your own client.
 
 **Source & full documentation:** [github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files](https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files)
 
@@ -91,15 +91,23 @@ pip install fca-handbook-harness-mcp
 
 The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients, but the config file location and restart step vary by client. Pick the one that matches what you are using.
 
-**Important:** The Harness API key should be supplied at runtime from an environment variable or secrets manager, never hardcoded as a literal value in a configuration file that may be committed to a shared repository. The server supports this directly: it loads a `.env` file automatically, so `METIS_API_KEY` never needs to appear in the client config at all.
+**Important:** The Harness API key should be supplied at runtime from an environment variable or secrets manager, never hardcoded as a literal value in a configuration file that may be committed to a shared repository. Two methods are supported — pick one, since they require different MCP config:
+
+- **Method A — Shell Profile.** Add `export METIS_API_KEY="sk_live_..."` to your shell startup file (`~/.bashrc`, `~/.zshrc`, etc.), before launching your MCP client (VS Code, Claude Desktop, etc.), so the variable is present in the client's own process environment. With this method, your MCP config should reference the variable via substitution:
+  ```json
+  "env": { "METIS_API_KEY": "${METIS_API_KEY}" }
+  ```
+- **Method B — .env File.** Create a `.env` file in your project directory containing `METIS_API_KEY=sk_live_...`. The server loads this itself at startup (via `load_dotenv()`) — your MCP client never needs to see the value. With this method, **omit the `env` block from your MCP config entirely.** Do not copy the `"${METIS_API_KEY}"` snippet from Method A — your client's own environment will not have that variable set, so the substitution will silently fail and pass the literal string `${METIS_API_KEY}` through as your API key. This produces a 401 error that is easy to mistake for a bad/revoked key.
+
+⚠️ If your MCP config lives in your home directory (e.g. `~/.claude/settings.json`) rather than a project-local location (e.g. `.claude/settings.json` in a project root), it applies to every project on the machine — a stray `${METIS_API_KEY}` placeholder there will break the harness for every project, not just the one you are setting up. Prefer a project-local config unless you specifically want a shared, machine-wide key.
 
 #### 3a. Claude Code
 
-Claude Code (the Claude IDE extension) supports both global (user-level) and project-level MCP configuration. 
+Claude Code (the Claude IDE extension) supports both global (user-level) and project-level MCP configuration.
 
 ##### Global Configuration (Recommended for FS Firms)
 
-If you work across multiple projects, configure the MCP globally in your user's `.claude/settings.json` so it is available everywhere.
+If you work across multiple projects, configure the MCP globally in your user's `.claude/settings.json` so it is available everywhere. Because this file is shared machine-wide, use **Method A** — a stray `.env` lookup path is per-project and does not fit a global setup as cleanly.
 
 **File location:** `~/.claude/settings.json` (your home directory)
 
@@ -118,50 +126,35 @@ Edit or create `~/.claude/settings.json` and add:
 }
 ```
 
-Then set the API key in your environment. Choose one approach:
-
-**Option A: Shell Profile (Recommended)**
-Add to your shell profile (e.g. `~/.bashrc`, `~/.zshrc`, `~/.fish/config.fish`):
+Then add to your shell profile (e.g. `~/.bashrc`, `~/.zshrc`, `~/.fish/config.fish`), **before** starting Claude Code:
 
 ```bash
 export METIS_API_KEY="sk_live_..."
 ```
 
-Replace `sk_live_...` with your actual API key from your Metis account. This value will be available to Claude Code and all other applications.
-
-**Option B: .env File**
-Create a `.env` file in your home directory or in a standard location your shell loads at startup, containing:
-
-```
-METIS_API_KEY=sk_live_...
-```
-
-The `${METIS_API_KEY}` in the config will be substituted from your environment when Claude Code starts the server.
+Replace `sk_live_...` with your actual API key from your Metis account. Claude Code substitutes `${METIS_API_KEY}` from this environment variable when it starts the server — if the variable is not set at that point, Claude Code loads the server with the literal string `${METIS_API_KEY}` instead (and warns about it), which is what causes the misleading 401 described in Troubleshooting below.
 
 **Restart:** Restart Claude Code. Once connected, the `evaluate_fca_handbook_applicability` tool will be available in all projects.
 
 ##### Project-Level Configuration (Single-Project Setup)
 
-If you only need the MCP in one specific project, configure it project-locally instead.
+If you only need the MCP in one specific project, configure it project-locally instead. This is the natural fit for **Method B**.
 
 **File location:** `.claude/settings.json` (in your project root, under `.claude/` directory)
 
-Edit or create `.claude/settings.json` and add:
+Edit or create `.claude/settings.json` and add — no `env` block, per Method B above:
 
 ```json
 {
   "mcpServers": {
     "fca-handbook-harness-mcp": {
-      "command": "fca-handbook-harness-mcp",
-      "env": {
-        "METIS_API_KEY": "${METIS_API_KEY}"
-      }
+      "command": "fca-handbook-harness-mcp"
     }
   }
 }
 ```
 
-Then create a `.env` file (in your project root) containing:
+Then create a `.env` file in your project root containing:
 
 ```
 METIS_API_KEY=sk_live_...
@@ -180,7 +173,9 @@ Replace `sk_live_...` with your actual API key from your Metis account.
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
-Add this server entry (create the file if it doesn't exist):
+Claude Desktop's config is inherently machine-wide (there is no project-local variant), so **Method A** is the more consistent fit — see the ⚠️ note above before using Method B here.
+
+**Method A — Shell Profile:**
 
 ```json
 {
@@ -195,29 +190,19 @@ Add this server entry (create the file if it doesn't exist):
 }
 ```
 
-Then set the API key in your environment:
-
-**Option A: System Environment Variable**
-Set `METIS_API_KEY` in your system environment (e.g. in `~/.bashrc`, system preferences, or via GUI):
+Set `METIS_API_KEY` in your system environment (e.g. in `~/.bashrc`, system preferences, or via GUI) **before** launching Claude Desktop:
 
 ```bash
 export METIS_API_KEY="sk_live_..."
 ```
 
-**Option B: .env File**
-Create a `.env` file in the directory Claude Desktop runs from, containing:
-
-```
-METIS_API_KEY=sk_live_...
-```
-
-Replace `sk_live_...` with your actual API key from your Metis account. The `${METIS_API_KEY}` in the config will be substituted from your environment when the server starts.
+**Method B — .env File:** create a `.env` file in the directory Claude Desktop runs from, containing `METIS_API_KEY=sk_live_...`, and use the config above with the `env` block omitted entirely (not left in with the `${METIS_API_KEY}` placeholder — see Method B warning above).
 
 **Restart:** Quit and restart the Claude Desktop app. Once connected, the `evaluate_fca_handbook_applicability` tool will be available.
 
 #### 3c. Other Clients (Cursor, Windsurf, Cline, etc.)
 
-These clients typically use the same `mcpServers` JSON shape as Claude Desktop above. Consult your client's documentation for the config file location and restart procedure (some use GUI connectors rather than JSON files).
+These clients typically use the same `mcpServers` JSON shape as Claude Desktop above. Consult your client's documentation for the config file location, restart procedure, and whether it performs `${VAR}` substitution in `env` blocks the way Claude Code and Claude Desktop do (some use GUI connectors rather than JSON files, or may not substitute at all — check before relying on Method A).
 
 ### 4. Verify the connection
 
@@ -245,8 +230,9 @@ The tool returns:
 - Confirm `fca-handbook-harness-mcp` resolves on the command line (`which fca-handbook-harness-mcp` / `where fca-handbook-harness-mcp`). Desktop MCP clients typically launch with a minimal environment and may not see the same PATH as your shell — if the command does not resolve, replace `"command": "fca-handbook-harness-mcp"` with the absolute path from that lookup
 - Restart your MCP client (not just reload)
 
-**401 Unauthorized:**
-- Verify `METIS_API_KEY` is set in the config `env`
+**401 Unauthorized with a key you've confirmed is valid on the dashboard:**
+- Check whether your MCP config still contains a literal `${METIS_API_KEY}` (or similar) placeholder that never got substituted — this happens when Method B (`.env`) is used but the config still has an `env` block written for Method A. Inspect the actual spawned server process's environment (e.g. `/proc/<pid>/environ` on Linux) to confirm what value it is really receiving
+- Verify `METIS_API_KEY` is set — either in the config `env` (Method A) or in a `.env` file the server can find (Method B), not both and not neither
 - Check the key is correct (copy from dashboard again)
 - Ensure no extra spaces or newlines in the key
 
