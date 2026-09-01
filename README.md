@@ -109,21 +109,34 @@ Edit or create `~/.claude/settings.json` and add:
 {
   "mcpServers": {
     "fca-handbook-harness-mcp": {
-      "command": "fca-handbook-harness-mcp"
+      "command": "fca-handbook-harness-mcp",
+      "env": {
+        "METIS_API_KEY": "${METIS_API_KEY}"
+      }
     }
   }
 }
 ```
 
-Then set the API key via environment variable. Add to your shell profile (e.g. `~/.bashrc`, `~/.zshrc`):
+Then set the API key in your environment. Choose one approach:
+
+**Option A: Shell Profile (Recommended)**
+Add to your shell profile (e.g. `~/.bashrc`, `~/.zshrc`, `~/.fish/config.fish`):
 
 ```bash
 export METIS_API_KEY="sk_live_..."
 ```
 
-Or in a global `.env` file that your shell loads on startup.
+Replace `sk_live_...` with your actual API key from your Metis account. This value will be available to Claude Code and all other applications.
 
-Replace `sk_live_...` with your actual API key from your Metis account.
+**Option B: .env File**
+Create a `.env` file in your home directory or in a standard location your shell loads at startup, containing:
+
+```
+METIS_API_KEY=sk_live_...
+```
+
+The `${METIS_API_KEY}` in the config will be substituted from your environment when Claude Code starts the server.
 
 **Restart:** Restart Claude Code. Once connected, the `evaluate_fca_handbook_applicability` tool will be available in all projects.
 
@@ -139,7 +152,10 @@ Edit or create `.claude/settings.json` and add:
 {
   "mcpServers": {
     "fca-handbook-harness-mcp": {
-      "command": "fca-handbook-harness-mcp"
+      "command": "fca-handbook-harness-mcp",
+      "env": {
+        "METIS_API_KEY": "${METIS_API_KEY}"
+      }
     }
   }
 }
@@ -153,7 +169,7 @@ METIS_API_KEY=sk_live_...
 
 Replace `sk_live_...` with your actual API key from your Metis account.
 
-**Note:** Project-level `.env` files are often checked into version control — ensure `METIS_API_KEY` is in `.gitignore` before committing.
+**Important:** Project-level `.env` files are often checked into version control — ensure `METIS_API_KEY` is in `.gitignore` before committing, or use the global configuration approach instead (recommended for FS firms).
 
 **Restart:** Claude Code will detect the change and reload MCP connections automatically (or you can restart the IDE).
 
@@ -170,19 +186,32 @@ Add this server entry (create the file if it doesn't exist):
 {
   "mcpServers": {
     "fca-handbook-harness-mcp": {
-      "command": "fca-handbook-harness-mcp"
+      "command": "fca-handbook-harness-mcp",
+      "env": {
+        "METIS_API_KEY": "${METIS_API_KEY}"
+      }
     }
   }
 }
 ```
 
-Then create a `.env` file (in the directory this server runs from) containing:
+Then set the API key in your environment:
+
+**Option A: System Environment Variable**
+Set `METIS_API_KEY` in your system environment (e.g. in `~/.bashrc`, system preferences, or via GUI):
+
+```bash
+export METIS_API_KEY="sk_live_..."
+```
+
+**Option B: .env File**
+Create a `.env` file in the directory Claude Desktop runs from, containing:
 
 ```
 METIS_API_KEY=sk_live_...
 ```
 
-Replace `sk_live_...` with your actual API key from your Metis account. (If your client does not run the server from a directory you control — some GUI-based connector flows do not — fall back to an `env` block in the config above instead.)
+Replace `sk_live_...` with your actual API key from your Metis account. The `${METIS_API_KEY}` in the config will be substituted from your environment when the server starts.
 
 **Restart:** Quit and restart the Claude Desktop app. Once connected, the `evaluate_fca_handbook_applicability` tool will be available.
 
