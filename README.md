@@ -99,19 +99,27 @@ The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients, but
   ```
 - **Method B — .env File.** Create a `.env` file in your project directory containing `METIS_API_KEY=sk_live_...`. The server loads this itself at startup (via `load_dotenv()`) — your MCP client never needs to see the value. With this method, **omit the `env` block from your MCP config entirely.** Do not copy the `"${METIS_API_KEY}"` snippet from Method A — your client's own environment will not have that variable set, so the substitution will silently fail and pass the literal string `${METIS_API_KEY}` through as your API key. This produces a 401 error that is easy to mistake for a bad/revoked key.
 
-⚠️ If your MCP config lives in your home directory (e.g. `~/.claude/settings.json`) rather than a project-local location (e.g. `.claude/settings.json` in a project root), it applies to every project on the machine — a stray `${METIS_API_KEY}` placeholder there will break the harness for every project, not just the one you are setting up. Prefer a project-local config unless you specifically want a shared, machine-wide key.
+⚠️ If your MCP config lives in your home directory (`~/.mcp.json`) rather than a project-local location (`.mcp.json` in a project root), it applies to every project on the machine — a stray `${METIS_API_KEY}` placeholder there will break the harness for every project, not just the one you are setting up. Prefer a project-local config unless you specifically want a shared, machine-wide key.
 
 #### 3a. Claude Code
 
-Claude Code (the Claude IDE extension) supports both global (user-level) and project-level MCP configuration.
+Claude Code (the Claude IDE extension) supports both global (user-level) and project-level MCP configuration. **Note:** MCP servers are configured in `.mcp.json` files, never in `.claude/settings.json` — that file is for permissions/preferences only and does not recognize an `mcpServers` key (Claude Code will reject it with `Unrecognized field: mcpServers`).
+
+The easiest way to add either scope is the CLI itself, which writes the correct file for you. Quote the `${METIS_API_KEY}` reference exactly as shown (single quotes) so your shell does not expand it before `claude mcp add` sees it — otherwise your actual key gets written as a literal into the config file, which is the hardcoding this whole section is trying to avoid:
+
+```bash
+claude mcp add --scope user fca-handbook-harness-mcp -e 'METIS_API_KEY=${METIS_API_KEY}' -- fca-handbook-harness-mcp
+```
+
+This is Method A — export the real key in your shell profile as shown below. Use `--scope project` instead of `--scope user` for a project-local setup. If you would rather edit the file directly, or want Method B (`.env`), see below.
 
 ##### Global Configuration (Recommended for FS Firms)
 
-If you work across multiple projects, configure the MCP globally in your user's `.claude/settings.json` so it is available everywhere. Because this file is shared machine-wide, use **Method A** — a stray `.env` lookup path is per-project and does not fit a global setup as cleanly.
+If you work across multiple projects, configure the MCP globally so it is available everywhere. Because this file is shared machine-wide, use **Method A** — a stray `.env` lookup path is per-project and does not fit a global setup as cleanly.
 
-**File location:** `~/.claude/settings.json` (your home directory)
+**File location:** `~/.mcp.json` (your home directory — note this is a standalone file, not inside `.claude/`)
 
-Edit or create `~/.claude/settings.json` and add:
+Edit or create `~/.mcp.json` and add:
 
 ```json
 {
@@ -140,9 +148,9 @@ Replace `sk_live_...` with your actual API key from your Metis account. Claude C
 
 If you only need the MCP in one specific project, configure it project-locally instead. This is the natural fit for **Method B**.
 
-**File location:** `.claude/settings.json` (in your project root, under `.claude/` directory)
+**File location:** `.mcp.json` in your project root (a standalone file, not inside `.claude/`)
 
-Edit or create `.claude/settings.json` and add — no `env` block, per Method B above:
+Edit or create `.mcp.json` and add — no `env` block, per Method B above:
 
 ```json
 {
@@ -162,7 +170,7 @@ METIS_API_KEY=sk_live_...
 
 Replace `sk_live_...` with your actual API key from your Metis account.
 
-**Important:** Project-level `.env` files are often checked into version control — ensure `METIS_API_KEY` is in `.gitignore` before committing, or use the global configuration approach instead (recommended for FS firms).
+**Important:** Project-level `.mcp.json` and `.env` files are often checked into version control — ensure `METIS_API_KEY` is in `.gitignore` before committing (the `.mcp.json` itself contains no secret, since Method B omits the `env` block), or use the global configuration approach instead (recommended for FS firms).
 
 **Restart:** Claude Code will detect the change and reload MCP connections automatically (or you can restart the IDE).
 
@@ -224,6 +232,9 @@ The tool returns:
 - **tokens**: Object with `input`, `output`, and `total` token counts, for cost/complexity tracking
 
 ## Troubleshooting
+
+**Claude Code: "Settings validation failed: Unrecognized field: mcpServers":**
+- This means `mcpServers` was added to `.claude/settings.json` (or `~/.claude/settings.json`) — that file does not support it. Move the `mcpServers` block to `.mcp.json` (project-local) or `~/.mcp.json` (global) instead, per 3a above, or run `claude mcp add --scope project|user ...` to have Claude Code write it for you.
 
 **Tool not appearing (Claude Desktop; the same class of issue applies to most desktop MCP clients):**
 - Verify the config file path (platform-specific, see above)
