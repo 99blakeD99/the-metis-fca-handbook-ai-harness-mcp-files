@@ -214,7 +214,9 @@ These clients typically use the same `mcpServers` JSON shape as Claude Desktop a
 
 ### 4. Verify the connection
 
-Once restarted, you should see `evaluate_fca_handbook_applicability` available as a tool in your agent workflows. If it does not appear, check the Troubleshooting section below.
+**Claude Code, first run only:** the first time you launch `claude` (interactively, not with `-p`) in a project with a new or changed project-scoped `.mcp.json`, it shows a one-time trust/approval prompt for that server before connecting — until you accept it, the server sits in a "pending approval" state and its tool is not actually available (running `claude mcp list` will show `⏸ Pending approval`). Accept the prompt, or run `/mcp` in an existing session to approve it there. This gate does not apply to `~/.mcp.json` (global scope).
+
+Once approved/restarted, you should see `evaluate_fca_handbook_applicability` available as a tool in your agent workflows. If it does not appear, check the Troubleshooting section below.
 
 ## Using the Tool
 
@@ -235,6 +237,9 @@ The tool returns:
 
 **Claude Code: "Settings validation failed: Unrecognized field: mcpServers":**
 - This means `mcpServers` was added to `.claude/settings.json` (or `~/.claude/settings.json`) — that file does not support it. Move the `mcpServers` block to `.mcp.json` (project-local) or `~/.mcp.json` (global) instead, per 3a above, or run `claude mcp add --scope project|user ...` to have Claude Code write it for you.
+
+**Claude Code: the model seems vaguely aware "an MCP" exists but does not know its name or what it does, and never calls it:**
+- This is the first-run approval gate (see step 4 above), not a tool-description problem — an unapproved project-scoped `.mcp.json` server never actually connects, so the model never receives its real name/description/schema, only generic MCP-resource tools. Run `claude mcp list` to confirm (`⏸ Pending approval` means this is it), then run `/mcp` or restart `claude` interactively to approve it.
 
 **Tool not appearing (Claude Desktop; the same class of issue applies to most desktop MCP clients):**
 - Verify the config file path (platform-specific, see above)
