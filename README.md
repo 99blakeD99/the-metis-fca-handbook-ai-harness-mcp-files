@@ -95,9 +95,43 @@ The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients, but
 
 #### 3a. Claude Code
 
-Claude Code (the Claude IDE extension) stores MCP configuration in your project's `.claude/settings.json`. This is project-local, not global — you configure it once per project.
+Claude Code (the Claude IDE extension) supports both global (user-level) and project-level MCP configuration. 
 
-**File location:** `.claude/settings.json` (in your project root)
+##### Global Configuration (Recommended for FS Firms)
+
+If you work across multiple projects, configure the MCP globally in your user's `.claude/settings.json` so it is available everywhere.
+
+**File location:** `~/.claude/settings.json` (your home directory)
+
+Edit or create `~/.claude/settings.json` and add:
+
+```json
+{
+  "mcpServers": {
+    "fca-handbook-harness-mcp": {
+      "command": "fca-handbook-harness-mcp"
+    }
+  }
+}
+```
+
+Then set the API key via environment variable. Add to your shell profile (e.g. `~/.bashrc`, `~/.zshrc`):
+
+```bash
+export METIS_API_KEY="sk_live_..."
+```
+
+Or in a global `.env` file that your shell loads on startup.
+
+Replace `sk_live_...` with your actual API key from your Metis account.
+
+**Restart:** Restart Claude Code. Once connected, the `evaluate_fca_handbook_applicability` tool will be available in all projects.
+
+##### Project-Level Configuration (Single-Project Setup)
+
+If you only need the MCP in one specific project, configure it project-locally instead.
+
+**File location:** `.claude/settings.json` (in your project root, under `.claude/` directory)
 
 Edit or create `.claude/settings.json` and add:
 
@@ -119,7 +153,9 @@ METIS_API_KEY=sk_live_...
 
 Replace `sk_live_...` with your actual API key from your Metis account.
 
-**Restart:** Claude Code will detect the change and reload MCP connections automatically (or you can restart the IDE). Once connected, the `evaluate_fca_handbook_applicability` tool will be available.
+**Note:** Project-level `.env` files are often checked into version control — ensure `METIS_API_KEY` is in `.gitignore` before committing.
+
+**Restart:** Claude Code will detect the change and reload MCP connections automatically (or you can restart the IDE).
 
 #### 3b. Claude Desktop
 
