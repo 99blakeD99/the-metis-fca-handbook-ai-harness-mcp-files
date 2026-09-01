@@ -91,6 +91,8 @@ pip install fca-handbook-harness-mcp
 
 This section walks through Claude Desktop as a fully worked example. The `mcpServers` JSON shape below is shared by most desktop/IDE MCP clients (Claude Code, Cursor, Windsurf, Cline, and others) — but the config file location and restart step are Claude Desktop's specifically. If you are using a different client, including one with a GUI-based connector flow (some OpenAI and Gemini integrations work this way) rather than a JSON config file, consult that client's own documentation for where to add a server.
 
+The Harness API key should be supplied at runtime from an environment variable or secrets manager, never hardcoded as a literal value in a configuration file that may be committed to a shared repository. The server supports this directly: it loads a `.env` file automatically (from the directory it runs in, or any parent), so `METIS_API_KEY` never needs to appear in the client config at all — the approach used below.
+
 **Claude Desktop file location:**
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
@@ -102,16 +104,19 @@ Add this server entry (create the file if it doesn't exist):
 {
   "mcpServers": {
     "fca-handbook-harness": {
-      "command": "fca-handbook-harness-mcp",
-      "env": {
-        "METIS_API_KEY": "sk_live_..."
-      }
+      "command": "fca-handbook-harness-mcp"
     }
   }
 }
 ```
 
-Replace `sk_live_...` with your actual API key from your Metis account.
+Then create a `.env` file (in the directory this server runs from) containing:
+
+```
+METIS_API_KEY=sk_live_...
+```
+
+Replace `sk_live_...` with your actual API key from your Metis account. (If your client does not run the server from a directory you control — some GUI-based connector flows do not — fall back to an `env` block in the config above instead.)
 
 ### 4. Restart your MCP client
 
@@ -127,11 +132,10 @@ The tool accepts two parameters:
 The tool returns:
 - **summary**: 2-3 sentence overview of applicability
 - **entry_analysis**: Retrieved FCA Handbook entries with reasoning
-- **obligations**: High-confidence, conditional, and low-confidence obligations
-- **gaps**: What the analysis couldn't determine from your input
-- **refinement_suggestions**: Follow-up information that would improve accuracy
+- **obligations**: High-confidence and low-confidence/tangential obligations, each optionally flagged with the specific condition under which it applies
+- **refinement_suggestions**: What the analysis couldn't determine from your input and why it matters, paired with the specific edit to make to improve accuracy
 - **citations**: Verbatim quotes from FCA Handbook with binding levels (R=Rule, G=Guidance)
-- **tokens**: Token count for cost/complexity tracking
+- **tokens**: Object with `input`, `output`, and `total` token counts, for cost/complexity tracking
 
 ## Troubleshooting
 

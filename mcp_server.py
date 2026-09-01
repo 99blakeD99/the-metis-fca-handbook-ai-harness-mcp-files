@@ -7,13 +7,22 @@ Claude Desktop, etc.). Calls a live, already-billed account via METIS_API_KEY
 Config (env vars):
     METIS_API_KEY   Required. Bearer token from an account's API Keys dashboard.
     METIS_BASE_URL  Optional. Defaults to the live Render deployment.
+
+Both can also be set via a .env file (loaded automatically, if present, from
+the current directory or any parent) rather than placed literally in the MCP
+client's own config file — see the README's Quick Start. A value already
+present in the environment (e.g. set directly in the client config) takes
+precedence over .env; .env only fills in what is not already set.
 """
 
 import json
 import os
 
 import requests
+from dotenv import load_dotenv
 from mcp.server.fastmcp import Context, FastMCP
+
+load_dotenv()
 
 BASE_URL = os.environ.get("METIS_BASE_URL", "https://fcahandbookharnessimplementation.onrender.com")
 API_KEY = os.environ.get("METIS_API_KEY")

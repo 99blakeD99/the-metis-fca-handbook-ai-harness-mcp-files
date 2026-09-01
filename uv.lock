@@ -337,16 +337,18 @@ wheels = [
 
 [[package]]
 name = "fca-handbook-harness-mcp"
-version = "0.1.3"
+version = "0.1.11"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },
+    { name = "python-dotenv" },
     { name = "requests" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "mcp", specifier = ">=1.0.0,<2.0.0" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "requests", specifier = ">=2.31.0" },
 ]
 

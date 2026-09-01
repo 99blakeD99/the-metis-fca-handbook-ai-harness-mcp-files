@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fca-handbook-harness-mcp"
-version = "0.1.10"
+version = "0.1.11"
 description = "MCP server for FCA Handbook compliance analysis via the Metis FCA Handbook AI Harness API."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "mcp>=1.0.0,<2.0.0",
     "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.urls]
