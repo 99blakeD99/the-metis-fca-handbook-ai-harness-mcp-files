@@ -20,7 +20,7 @@ Evaluate which FCA Handbook entries apply to an entity, via the Metis FCA Handbo
 
 - **Verbatim citations** Quotes verbatim entries from the FCA Handbook. Other AI systems struggle to do this.
 
-- **Matches real-world need** You do not have to start off knowing which sections you are looking for. Carries out structured searches across all 10,000+ FCA Handbook entries.
+- **Matches real-world need** You do not have to start off knowing which sections you are looking for. Carries out structured searches across all 33,000+ FCA Handbook entries.
 
 - **Secure Design** Harness compartmentalisation, one-shot structure, and statelessness fits natively with emerging AI agent security standards such as OWASP Top 10 for Agentic Applications 2026.
 
