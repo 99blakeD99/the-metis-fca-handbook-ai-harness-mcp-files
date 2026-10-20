@@ -12,6 +12,7 @@ server.json.backup
 
 # Not relevant to the bundle
 .gitignore
+sync_to_mirror.py
 
 # OS
 .DS_Store
