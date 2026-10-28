@@ -44,11 +44,20 @@ async def evaluate_fca_handbook_applicability(
     Calls a live compliance reasoning run, billed to the configured account.
     Use for questions involving the FCA Handbook, including authorisation, permissions, or obligations for a specific firm/product/service.
 
-    This call takes 60-120+ seconds (longer in 'full' mode). Tell the user
-    up front that you are starting a long-running call, before you call the
-    tool — do not go silent. The Harness attempts to stream progress messages
-    as each reasoning node completes - if you receive them, relay each one
-    to the user as it arrives — they contain genuine detail, not filler.
+    This call takes 60-120 seconds in 'quick' mode and 90-120 seconds in 'full' mode, and the longest
+    stretch, the main reasoning step (node 6), shows nothing new on the
+    user's screen, so it can look as if the call has crashed. Before you call
+    the tool, always tell the user in plain words that the Harness is about
+    to do substantial reasoning work, that this takes a minute or two, and
+    that it has not crashed if the screen is quiet. Do
+    not go silent. The Harness attempts to stream progress messages as each
+    reasoning node completes - if you receive them, relay each one to the
+    user as it arrives — they contain genuine detail, not filler.
+
+    Billing rule: every call is a separate charge. After a result arrives,
+    never start another call, whether 'quick' or 'full', in the same turn or
+    without the user's explicit yes to that specific further run, even when
+    the refinement suggestions make another pass look clearly worthwhile.
 
     First call: use analysis_mode='quick'. Before calling, check whether you
     already have (from this conversation, documents you were given, or other
@@ -71,9 +80,10 @@ async def evaluate_fca_handbook_applicability(
     that reintroduces the hallucination risk this Harness exists to avoid,
     one level up.
 
-    Refining (second call onward): use analysis_mode='full'. Either way, before calling again, confirm with the user
-    that you are about to run a further 'full' pass with the refined input —
-    do not call again unilaterally, and do not just list the gaps and stop.
+    Refining (second call onward): use analysis_mode='full'. Either way, before calling again, stop and ask the user
+    whether they want a further 'full' pass with the refined input, saying
+    that it is a further charge, and wait for their answer — never call
+    again unilaterally, and do not just list the gaps and stop.
     Repeat this pattern for further rounds if the new result still leaves
     suggestions worth resolving.
 
@@ -93,7 +103,7 @@ async def evaluate_fca_handbook_applicability(
             detail later rounds have gathered. See "First call" and
             "Refining" above.
         analysis_mode: 'quick' for the first call (default, ~60-120
-            seconds); 'full' (longer) for refined calls after the first —
+            seconds); 'full' (~90-120 seconds) for refined calls after the first —
             detailed conditional reasoning: conditions, interactions
             between rules, and second-order implications. See "Refining"
             above for when to switch and why to confirm with the user first.

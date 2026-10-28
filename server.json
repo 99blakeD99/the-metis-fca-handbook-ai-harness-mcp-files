@@ -6,12 +6,12 @@
     "url": "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-files",
     "source": "github"
   },
-  "version": "0.1.3",
+  "version": "0.1.13",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "fca-handbook-harness-mcp",
-      "version": "0.1.3",
+      "version": "0.1.13",
       "transport": {
         "type": "stdio"
       },
@@ -28,6 +28,28 @@
           "isRequired": false,
           "format": "string",
           "name": "METIS_BASE_URL"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://fcahandbookharnessimplementation.onrender.com/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token: your Metis API key, from an account's API Keys dashboard",
+          "isRequired": true,
+          "isSecret": true,
+          "value": "Bearer {metis_api_key}",
+          "variables": {
+            "metis_api_key": {
+              "description": "Your Metis API key",
+              "isRequired": true,
+              "isSecret": true
+            }
+          }
         }
       ]
     }
