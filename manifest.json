@@ -3,7 +3,7 @@
   "name": "fca-handbook-harness-mcp",
   "display_name": "The Metis FCA Handbook AI Harness",
   "version": "0.1.2",
-  "description": "MCP server for FCA Handbook compliance analysis with verbatim citations.",
+  "description": "Which FCA Handbook entries apply to a situation: reasoning from the current Handbook text, with verbatim citations. Each call is billed to your Metis account.",
   "author": {
     "name": "Blake Dempster",
     "email": "blake.dempster@gmail.com"

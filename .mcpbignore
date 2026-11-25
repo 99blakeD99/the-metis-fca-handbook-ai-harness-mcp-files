@@ -14,5 +14,8 @@ server.json.backup
 .gitignore
 sync_to_mirror.py
 
+# Maintainer-only: prompt for an independent review of the tool description
+tool-description-review-prompt.md
+
 # OS
 .DS_Store

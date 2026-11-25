@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "fca-handbook-harness-mcp"
-version = "0.1.13"
-description = "MCP server for FCA Handbook compliance analysis via the Metis FCA Handbook AI Harness API."
+version = "0.1.14"
+description = "Which FCA Handbook entries apply: reasoning from current Handbook text, with verbatim citations."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -34,5 +34,7 @@ Issues = "https://github.com/99blakeD99/the-metis-fca-handbook-ai-harness-mcp-fi
 [project.scripts]
 fca-handbook-harness-mcp = "mcp_server:main"
 
-[tool.setuptools]
-py-modules = ["mcp_server"]
+# tool-description.md is the single source of the tool description and must
+# ship beside mcp_server.py (which reads it when it starts).
+[tool.hatch.build.targets.wheel]
+include = ["mcp_server.py", "tool-description.md"]

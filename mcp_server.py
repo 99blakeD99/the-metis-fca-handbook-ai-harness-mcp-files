@@ -17,97 +17,98 @@ precedence over .env; .env only fills in what is not already set.
 
 import json
 import os
+import re
+from pathlib import Path
+from typing import Annotated, Any, Dict
 
 import requests
 from dotenv import load_dotenv
 from mcp.server.fastmcp import Context, FastMCP
+from mcp.types import ToolAnnotations
+from pydantic import Field
 
 load_dotenv()
 
 BASE_URL = os.environ.get("METIS_BASE_URL", "https://fcahandbookharnessimplementation.onrender.com")
 API_KEY = os.environ.get("METIS_API_KEY")
 
-# "message" events on a full run: one per reasoning node (7-8 total, including
-# final "Analysis complete"). Just a hint for the progress indicator, not a hard
-# guarantee — a triage rejection ends after step 1, with an error, not 8.
+# "message" events on a run: one per node (Nodes 2 to 8, seven in all, since this route
+# runs no Node 1 gate) plus the final "Analysis complete". Just a hint for the progress
+# indicator, not a hard guarantee.
 _EXPECTED_PROGRESS_STEPS = 8
+
+TOOL_DESCRIPTION_PATH = Path(__file__).with_name("tool-description.md")
+
+
+def load_tool_spec(path: Path = TOOL_DESCRIPTION_PATH) -> Dict[str, Any]:
+    """Read tool-description.md, the single source of the tool's description.
+
+    Returns {"title", "annotations" (a ToolAnnotations), "description", "args"
+    (argument name -> description; optional, and empty when the file has no
+    "##" sections, in which case the arguments carry no description in the
+    input schema)}. Plain text parsing, with no YAML
+    dependency, because the published package depends only on mcp, requests
+    and python-dotenv. Raises a clear error at startup if the file is missing
+    or incomplete, rather than serving an empty description.
+    """
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except OSError as exc:
+        raise RuntimeError(
+            f"The tool description file {path} is missing or unreadable ({exc}). "
+            "It is part of the package; reinstall it."
+        ) from exc
+
+    match = re.match(r"^---\n(.*?)\n---\n(.*)\Z", text, re.DOTALL)
+    if not match:
+        raise RuntimeError(f"{path} must start with a front matter block between --- lines")
+    front = {}
+    for line in match.group(1).splitlines():
+        if ":" in line:
+            key, value = line.split(":", 1)
+            front[key.strip()] = value.strip()
+    body = re.sub(r"<!--.*?-->", "", match.group(2), flags=re.DOTALL)
+    body = re.sub(r"^# .*\n", "", body, flags=re.MULTILINE)
+
+    sections = re.split(r"^## ", body, flags=re.MULTILINE)
+    description = sections[0].strip()
+    args = {}
+    for section in sections[1:]:
+        name, _, arg_text = section.partition("\n")
+        args[name.strip()] = arg_text.strip()
+
+    if not description or not front.get("title"):
+        raise RuntimeError(f"{path} needs a title in the front matter and a description")
+
+    def flag(key: str) -> bool:
+        return front.get(key, "false").lower() == "true"
+
+    annotations = ToolAnnotations(
+        readOnlyHint=flag("read_only"),
+        destructiveHint=flag("destructive"),
+        idempotentHint=flag("idempotent"),
+        openWorldHint=flag("open_world"),
+    )
+    return {"title": front["title"], "annotations": annotations, "description": description, "args": args}
+
+
+TOOL_SPEC = load_tool_spec()
 
 mcp = FastMCP("Metis FCA Handbook AI Harness")
 
 
-@mcp.tool()
+@mcp.tool(
+    title=TOOL_SPEC["title"],
+    description=TOOL_SPEC["description"],
+    annotations=TOOL_SPEC["annotations"],
+)
 async def evaluate_fca_handbook_applicability(
-    user_input: str, analysis_mode: str = "quick", ctx: Context = None
+    user_input: Annotated[str, Field(description=TOOL_SPEC["args"].get("user_input"))],
+    analysis_mode: Annotated[str, Field(description=TOOL_SPEC["args"].get("analysis_mode"))] = "quick",
+    ctx: Context = None,
 ) -> dict:
-    """Evaluate which FCA Handbook entries apply to a situation as input by the user, using the Metis FCA Handbook AI Harness.
-
-    Calls a live compliance reasoning run, billed to the configured account.
-    Use for questions involving the FCA Handbook, including authorisation, permissions, or obligations for a specific firm/product/service.
-
-    This call takes 60-120 seconds in 'quick' mode and 90-120 seconds in 'full' mode, and the longest
-    stretch, the main reasoning step (node 6), shows nothing new on the
-    user's screen, so it can look as if the call has crashed. Before you call
-    the tool, always tell the user in plain words that the Harness is about
-    to do substantial reasoning work, that this takes a minute or two, and
-    that it has not crashed if the screen is quiet. Do
-    not go silent. The Harness attempts to stream progress messages as each
-    reasoning node completes - if you receive them, relay each one to the
-    user as it arrives — they contain genuine detail, not filler.
-
-    Billing rule: every call is a separate charge. After a result arrives,
-    never start another call, whether 'quick' or 'full', in the same turn or
-    without the user's explicit yes to that specific further run, even when
-    the refinement suggestions make another pass look clearly worthwhile.
-
-    First call: use analysis_mode='quick'. Before calling, check whether you
-    already have (from this conversation, documents you were given, or other
-    tools) grounded answers to these six things — the specific compliance
-    question, the product/service, who is providing it (platform/adviser/
-    bank/etc.), its key features, the target market (retail/institutional/
-    professional/customer segment), and what data it handles. If you are missing more than
-    one or two, ask the user for them first rather than calling with thin
-    input. Every call is billed at a flat rate regardless of input quality,
-    so a vague call incurs unnecessary cost.
-
-    The result
-    includes refinement_suggestions — gaps the Harness could not resolve
-    from user_input alone, typically subtler than the six basics above (e.g.
-    a regulatory edge case, not a missing fact you could have just asked
-    for). For each suggestion worth pursuing, get the grounded information —
-    retrieve it from this conversation, documents you were given, or other
-    tools if you already have it; otherwise ask the user directly. Do not
-    speculate or infer plausible-sounding detail you do not actually have —
-    that reintroduces the hallucination risk this Harness exists to avoid,
-    one level up.
-
-    Refining (second call onward): use analysis_mode='full'. Either way, before calling again, stop and ask the user
-    whether they want a further 'full' pass with the refined input, saying
-    that it is a further charge, and wait for their answer — never call
-    again unilaterally, and do not just list the gaps and stop.
-    Repeat this pattern for further rounds if the new result still leaves
-    suggestions worth resolving.
-
-    The result's citations field contains verbatim quotes from the FCA
-    Handbook — this is a core part of what the Harness offers, not
-    generative invention, and distinct from the summary/obligations text. They can best be viewed as an Appendix.
-    Citations can be long, so ask the user whether they want the relevant
-    verbatim citations included, rather than omitting them by default as
-    mere detail.
-
-    Args:
-        user_input: Everything together as one piece of text (up to 5000
-            characters) — the specific compliance question, the
-            product/service, who is providing it, its key features, the
-            target market, and what data it handles. On later rounds, refine
-            all six using existing chat context and whatever additional
-            detail later rounds have gathered. See "First call" and
-            "Refining" above.
-        analysis_mode: 'quick' for the first call (default, ~60-120
-            seconds); 'full' (~90-120 seconds) for refined calls after the first —
-            detailed conditional reasoning: conditions, interactions
-            between rules, and second-order implications. See "Refining"
-            above for when to switch and why to confirm with the user first.
-    """
+    # The description (and the argument descriptions above) live in
+    # tool-description.md, not in a docstring.
     if not API_KEY:
         raise RuntimeError("METIS_API_KEY is not set in the MCP server's environment")
 
